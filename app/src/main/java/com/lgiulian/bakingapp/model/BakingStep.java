@@ -1,8 +1,12 @@
 package com.lgiulian.bakingapp.model;
 
-import android.util.JsonReader;
+import android.util.Log;
 
-import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -10,80 +14,46 @@ import java.util.ArrayList;
  */
 
 public class BakingStep {
+    private static final String TAG = BakingStep.class.getSimpleName();
+
     private int id;
     private String shortDescription;
     private String description;
     private String videoURL;
     private String thumbnailURL;
 
-    /** Method reads all the baking steps from a json reader
-     * @param reader
+    /** Method reads all the baking steps from a json array
      * @return the list of baking steps
      */
-    public static ArrayList<BakingStep> getAllBakingSteps(JsonReader reader){
-        ;
+    public static ArrayList<BakingStep> getAllBakingSteps(JSONArray stepsArray){
         ArrayList<BakingStep> steps = new ArrayList<>();
         try {
-            reader.beginArray();
-            while (reader.hasNext()) {
-                steps.add(readEntry(reader));
+            if (stepsArray != null) {
+                for (int i = 0; i < stepsArray.length(); i++) {
+                    BakingStep bakingStep = getStepFromJsonObject(stepsArray.getJSONObject(i));
+                    steps.add(bakingStep);
+                }
             }
-            reader.close();
-        } catch (IOException e) {
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         return steps;
     }
 
-    /** Method used to read a single baking step from a json reader
-     * @param reader
-     * @return a baking step
-     */
-    private static BakingStep readEntry(JsonReader reader) {
-        int id = 0;
-        String shortDescription = null;
-        String description = null;
-        String videoURL = null;
-        String thumbnailURL = null;
+    private static BakingStep getStepFromJsonObject(JSONObject recipeJsonObject) throws ParseException, JSONException {
+        BakingStep step = new BakingStep();
+        step.setId(recipeJsonObject.optInt("id"));
+        step.setShortDescription(recipeJsonObject.optString("shortDescription"));
+        step.setDescription(recipeJsonObject.optString("description"));
+        step.setVideoURL(recipeJsonObject.optString("videoURL"));
+        step.setThumbnailURL(recipeJsonObject.optString("thumbnailURL"));
 
-        try {
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                switch (name) {
-                    case "id":
-                        id = reader.nextInt();
-                        break;
-                    case "shortDescription":
-                        shortDescription = reader.nextString();
-                        break;
-                    case "description":
-                        description = reader.nextString();
-                        break;
-                    case "videoURL":
-                        videoURL = reader.nextString();
-                        break;
-                    case "thumbnailURL":
-                        thumbnailURL = reader.nextString();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            reader.endObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Log.v(TAG, step.toString());
 
-        return new BakingStep(id, shortDescription, description, videoURL, thumbnailURL);
-    }
-
-    public BakingStep(int id, String shortDescription, String description, String videoURL, String thumbnailURL) {
-        this.id = id;
-        this.shortDescription = shortDescription;
-        this.description = description;
-        this.videoURL = videoURL;
-        this.thumbnailURL = thumbnailURL;
+        return step;
     }
 
     public int getId() {

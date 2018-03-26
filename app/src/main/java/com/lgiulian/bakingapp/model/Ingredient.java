@@ -1,8 +1,12 @@
 package com.lgiulian.bakingapp.model;
 
-import android.util.JsonReader;
+import android.util.Log;
 
-import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -10,68 +14,42 @@ import java.util.ArrayList;
  */
 
 public class Ingredient {
+    private static final String TAG = Ingredient.class.getSimpleName();
+
     private double quantity;
     private String measure;
     private String ingredient;
 
-    /** Method reads all the ingredients from a json reader
-     * @param reader
+    /** Method reads all the ingredients from a json array
      * @return the list of ingredients
      */
-    public static ArrayList<Ingredient> getAllIngredients(JsonReader reader){
-        ;
+    public static ArrayList<Ingredient> getAllIngredients(JSONArray ingredientsArray){
         ArrayList<Ingredient> ingredients = new ArrayList<>();
         try {
-            reader.beginArray();
-            while (reader.hasNext()) {
-                ingredients.add(readEntry(reader));
+            if (ingredientsArray != null) {
+                for (int i = 0; i < ingredientsArray.length(); i++) {
+                    Ingredient ingredient = getIngredientFromJsonObject(ingredientsArray.getJSONObject(i));
+                    ingredients.add(ingredient);
+                }
             }
-            reader.close();
-        } catch (IOException e) {
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         return ingredients;
     }
 
-    /** Method used to read a single ingredient from a json reader
-     * @param reader
-     * @return an ingredient
-     */
-    private static Ingredient readEntry(JsonReader reader) {
-        double quantity = 0.0;
-        String measure = null;
-        String ingredient = null;
+    private static Ingredient getIngredientFromJsonObject(JSONObject recipeJsonObject) throws ParseException, JSONException {
+        Ingredient ingredient = new Ingredient();
+        ingredient.setQuantity(recipeJsonObject.optDouble("quantity"));
+        ingredient.setMeasure(recipeJsonObject.optString("measure"));
+        ingredient.setIngredient(recipeJsonObject.optString("ingredient"));
 
-        try {
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                switch (name) {
-                    case "quantity":
-                        quantity = reader.nextDouble();
-                        break;
-                    case "measure":
-                        measure = reader.nextString();
-                        break;
-                    case "ingredient":
-                        ingredient = reader.nextString();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            reader.endObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Log.v(TAG, ingredient.toString());
 
-        return new Ingredient(quantity, measure, ingredient);
-    }
-
-    public Ingredient(double quantity, String measure, String ingredient) {
-        this.quantity = quantity;
-        this.measure = measure;
-        this.ingredient = ingredient;
+        return ingredient;
     }
 
     public double getQuantity() {

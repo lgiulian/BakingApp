@@ -3,7 +3,6 @@ package com.lgiulian.bakingapp.model;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.net.Uri;
-import android.util.JsonReader;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -14,9 +13,15 @@ import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.util.Util;
 import com.lgiulian.bakingapp.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,72 +44,43 @@ public class Recipe {
      * @return a list of recipes
      */
     public static ArrayList<Recipe> getAllRecipes(Context context){
-        JsonReader reader;
+        String json;
         ArrayList<Recipe> recipes = new ArrayList<>();
         try {
-            reader = readJSONFile(context);
-            reader.beginArray();
-            while (reader.hasNext()) {
-                recipes.add(readEntry(reader));
+            json = readJSONFile(context);
+            JSONArray recipesArray = new JSONArray(json);
+            if (recipesArray != null) {
+                for (int i = 0; i < recipesArray.length(); i++) {
+                    Recipe recipe = getRecipeFromJsonObject(recipesArray.getJSONObject(i));
+                    recipes.add(recipe);
+                }
             }
-            reader.close();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return recipes;
     }
 
-    /** Method used to read a single recipe from a json file
-     * @param reader
-     * @return a recipe
-     */
-    private static Recipe readEntry(JsonReader reader) {
-        int id = 0;
-        String recipeName = null;
-        List<Ingredient> ingredients = null;
-        List<BakingStep> steps = null;
-        int servings = 0;
-        String image = null;
+    private static Recipe getRecipeFromJsonObject(JSONObject recipeJsonObject) throws ParseException, JSONException {
+        Recipe recipe = new Recipe();
+        recipe.setId(recipeJsonObject.optInt("id"));
+        recipe.setName(recipeJsonObject.optString("name"));
+        recipe.setServings(recipeJsonObject.optInt("servings"));
+        recipe.setImage(recipeJsonObject.optString("image"));
+        recipe.setIngredients(Ingredient.getAllIngredients(recipeJsonObject.getJSONArray("ingredients")));
+        recipe.setSteps(BakingStep.getAllBakingSteps(recipeJsonObject.getJSONArray("steps")));
 
-        try {
-            reader.beginObject();
-            while (reader.hasNext()) {
-                String name = reader.nextName();
-                Log.d(TAG, "name = " + name);
-                switch (name) {
-                    case "id":
-                        id = reader.nextInt();
-                        break;
-                    case "recipeName":
-                        recipeName = reader.nextString();
-                        break;
-                    case "ingredients":
-                        reader.beginObject();
-                        ingredients = Ingredient.getAllIngredients(reader);
-                        break;
-                    case "steps":
-                        reader.beginObject();
-                        steps = BakingStep.getAllBakingSteps(reader);
-                        break;
-                    case "servings":
-                        servings = reader.nextInt();
-                        break;
-                    case "image":
-                        image = reader.nextString();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            reader.endObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Log.v(TAG, recipe.toString());
 
-        return new Recipe(id, recipeName, ingredients, steps, servings, image);
+        return recipe;
     }
 
-    private static JsonReader readJSONFile(Context context) throws IOException {
+    private static String readJSONFile(Context context) throws IOException {
         AssetManager assetManager = context.getAssets();
         String uri = null;
 
@@ -123,23 +99,16 @@ public class Recipe {
         DataSpec dataSpec = new DataSpec(Uri.parse(uri));
         InputStream inputStream = new DataSourceInputStream(dataSource, dataSpec);
 
-        JsonReader reader = null;
-        try {
-            reader = new JsonReader(new InputStreamReader(inputStream, "UTF-8"));
-        } finally {
-            Util.closeQuietly(dataSource);
+        StringBuilder buf = new StringBuilder();
+        BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+        String str;
+
+        while ((str=in.readLine()) != null) {
+            buf.append(str);
         }
+        in.close();
 
-        return reader;
-    }
-
-    public Recipe(int id, String name, List<Ingredient> ingredients, List<BakingStep> steps, int servings, String image) {
-        this.id = id;
-        this.name = name;
-        this.ingredients = ingredients;
-        this.steps = steps;
-        this.servings = servings;
-        this.image = image;
+        return buf.toString();
     }
 
     public int getId() {

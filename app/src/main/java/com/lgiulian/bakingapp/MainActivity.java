@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         List<Recipe> recipes = Recipe.getAllRecipes(this);
-        for (Recipe recipe: recipes) {
-            Log.d(TAG, recipe.toString());
-        }
+//        for (Recipe recipe: recipes) {
+//            Log.d(TAG, recipe.toString());
+//        }
     }
 }
