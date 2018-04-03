@@ -19,10 +19,11 @@ import java.util.List;
 import timber.log.Timber;
 
 import static com.lgiulian.bakingapp.ExoPlayerFragment.MEDIA_URL_KEY;
+import static com.lgiulian.bakingapp.MainActivity.RECIPE_KEY;
 import static com.lgiulian.bakingapp.RecipeStepInstructionsFragment.STEP_INSTRUCTIONS_KEY;
 
 public class RecipeActivity extends AppCompatActivity implements RecipeDetailsFragment.OnRecipeStepClickListener {
-    public static final String RECIPE_NAME_KEY = "RECIPE_NAME_KEY";
+    public static final String STEP_SELECTED_KEY = "STEP_SELECTED_KEY";
     private boolean mTwoPane;
     private Recipe mRecipe;
 
@@ -34,12 +35,12 @@ public class RecipeActivity extends AppCompatActivity implements RecipeDetailsFr
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState != null) {
-            mRecipe = savedInstanceState.getParcelable(MainActivity.RECIPE_KEY);
+            mRecipe = savedInstanceState.getParcelable(RECIPE_KEY);
         }
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            mRecipe = extras.getParcelable(MainActivity.RECIPE_KEY);
+            mRecipe = extras.getParcelable(RECIPE_KEY);
             if (mRecipe != null && !TextUtils.isEmpty(mRecipe.getName())) {
                 getSupportActionBar().setTitle(mRecipe.getName());
             }
@@ -83,7 +84,7 @@ public class RecipeActivity extends AppCompatActivity implements RecipeDetailsFr
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(MainActivity.RECIPE_KEY, mRecipe);
+        outState.putParcelable(RECIPE_KEY, mRecipe);
     }
 
     @Override
@@ -119,9 +120,8 @@ public class RecipeActivity extends AppCompatActivity implements RecipeDetailsFr
                     .commit();
         } else {
             Bundle b = new Bundle();
-            b.putString(MEDIA_URL_KEY, step.getVideoURL());
-            b.putString(STEP_INSTRUCTIONS_KEY, step.getDescription());
-            b.putString(RECIPE_NAME_KEY, mRecipe.getName());
+            b.putParcelable(RECIPE_KEY, mRecipe);
+            b.putInt(STEP_SELECTED_KEY, position);
             Intent intent = new Intent(this, BakingStepActivity.class);
             intent.putExtras(b);
             startActivity(intent);

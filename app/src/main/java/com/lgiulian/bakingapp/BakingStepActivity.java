@@ -6,15 +6,26 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.lgiulian.bakingapp.model.BakingStep;
+import com.lgiulian.bakingapp.model.Recipe;
+import com.stepstone.stepper.StepperLayout;
+import com.stepstone.stepper.VerificationError;
+
+import java.util.List;
 
 import timber.log.Timber;
 
-import static com.lgiulian.bakingapp.ExoPlayerFragment.MEDIA_URL_KEY;
-import static com.lgiulian.bakingapp.RecipeStepInstructionsFragment.STEP_INSTRUCTIONS_KEY;
-
-public class BakingStepActivity extends AppCompatActivity {
+public class BakingStepActivity extends AppCompatActivity implements StepperLayout.StepperListener {
     private String mMediaUrl;
     private String mInstructions;
+
+    private StepperLayout mStepperLayout;
+    private Recipe mRecipe;
+    private int mCurrentStep;
+
+    private boolean mTwoFraments;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -25,11 +36,15 @@ public class BakingStepActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            mMediaUrl = extras.getString(MEDIA_URL_KEY);
-            mInstructions = extras.getString(STEP_INSTRUCTIONS_KEY);
+            mRecipe = extras.getParcelable(MainActivity.RECIPE_KEY);
+            mCurrentStep = extras.getInt(RecipeActivity.STEP_SELECTED_KEY);
+            List<BakingStep> steps = mRecipe.getSteps();
+            BakingStep step = steps.get(mCurrentStep);
+
+            mMediaUrl = step.getVideoURL();
+            mInstructions = step.getDescription();
             Timber.d("step instructions: %s", mInstructions);
-            String recipeName = extras.getString(RecipeActivity.RECIPE_NAME_KEY, getString(R.string.app_name));
-            getSupportActionBar().setTitle(recipeName);
+            getSupportActionBar().setTitle(mRecipe.getName());
         }
 
         if (savedInstanceState == null) {
@@ -45,6 +60,7 @@ public class BakingStepActivity extends AppCompatActivity {
         }
 
         if (findViewById(R.id.step_instructions) != null) {
+            mTwoFraments = true;
             if (savedInstanceState == null) {
                 RecipeStepInstructionsFragment stepInstructionsFragment = new RecipeStepInstructionsFragment();
                 stepInstructionsFragment.setStepDescription(mInstructions);
@@ -54,6 +70,13 @@ public class BakingStepActivity extends AppCompatActivity {
                         .add(R.id.step_instructions, stepInstructionsFragment)
                         .commit();
             }
+            mStepperLayout = findViewById(R.id.stepperLayout);
+            BakingStepAdapter bakingStepAdapter = new BakingStepAdapter(getSupportFragmentManager(), this, mRecipe.getSteps().size());
+            mStepperLayout.setAdapter(bakingStepAdapter);
+            mStepperLayout.setListener(this);
+            mStepperLayout.setCurrentStepPosition(mCurrentStep);
+        } else {
+            mTwoFraments = false;
         }
     }
 
@@ -66,5 +89,46 @@ public class BakingStepActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCompleted(View completeButton) {
+        NavUtils.navigateUpFromSameTask(this);
+    }
+
+    @Override
+    public void onError(VerificationError verificationError) {
+
+    }
+
+    @Override
+    public void onStepSelected(int newStepPosition) {
+        Timber.d("new step position: %d", newStepPosition);
+        mCurrentStep = newStepPosition;
+        List<BakingStep> steps = mRecipe.getSteps();
+        BakingStep step = steps.get(mCurrentStep);
+        mMediaUrl = step.getVideoURL();
+        mInstructions = step.getDescription();
+
+        ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
+        exoPlayerFragment.setMediaUrl(step.getVideoURL());
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.playerView, exoPlayerFragment)
+                .commit();
+
+        if (mTwoFraments) {
+            RecipeStepInstructionsFragment stepInstructionsFragment = new RecipeStepInstructionsFragment();
+            stepInstructionsFragment.setStepDescription(step.getDescription());
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.step_instructions, stepInstructionsFragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    public void onReturn() {
+
     }
 }
