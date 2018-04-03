@@ -3,6 +3,8 @@ package com.lgiulian.bakingapp.model;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,7 +31,7 @@ import java.util.List;
  * Created by iulian on 3/24/2018.
  */
 
-public class Recipe {
+public class Recipe implements Parcelable {
     private static final String TAG = Recipe.class.getSimpleName();
 
     private int id;
@@ -38,6 +40,19 @@ public class Recipe {
     private List<BakingStep> steps;
     private int servings;
     private String image;
+
+    private Recipe(Parcel in) {
+        this.id = in.readInt();
+        this.name = in.readString();
+        ingredients = new ArrayList<>();
+        in.readTypedList(ingredients, Ingredient.CREATOR);
+        steps = new ArrayList<>();
+        in.readTypedList(steps, BakingStep.CREATOR);
+        this.servings = in.readInt();
+        this.image = in.readString();
+    }
+
+    public Recipe() {}
 
     /** Method that reads all the recipes from a json file
      * @param context
@@ -170,4 +185,32 @@ public class Recipe {
                 ", image='" + image + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeTypedList(ingredients);
+        dest.writeTypedList(steps);
+        dest.writeInt(servings);
+        dest.writeString(image);
+    }
+
+    public static final Parcelable.Creator<Recipe> CREATOR = new Parcelable.Creator<Recipe>() {
+        @Override
+        public Recipe createFromParcel(Parcel source) {
+            return new Recipe(source);
+        }
+
+        @Override
+        public Recipe[] newArray(int size) {
+            return new Recipe[size];
+        }
+
+    };
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/grid_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/grid_item_padding"
+    android:background="@drawable/grid_color_selector"
+    android:orientation="vertical"
+    android:padding="@dimen/grid_item_padding">
+
+    <TextView
+        android:id="@+id/recipe_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/recipe_card_height"
+        android:layout_marginTop="@dimen/grid_item_padding"
+        android:layout_marginBottom="@dimen/grid_item_padding"
+        android:gravity="center"
+        android:textSize="@dimen/grid_item_text_size"
+        tools:text="First recipe"/>
+
+</LinearLayout>

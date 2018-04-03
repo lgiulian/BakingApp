@@ -3,9 +3,10 @@
     android:id="@+id/recipes_grid_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:columnWidth="180dp"
     android:gravity="center"
     android:horizontalSpacing="8dp"
-    android:numColumns="1"
+    android:numColumns="3"
     android:padding="@dimen/default_padding"
     android:stretchMode="columnWidth"
     android:verticalSpacing="@dimen/default_vertical_spacing" />

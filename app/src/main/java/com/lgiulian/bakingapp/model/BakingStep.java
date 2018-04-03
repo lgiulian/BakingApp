@@ -1,5 +1,7 @@
 package com.lgiulian.bakingapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -13,7 +15,7 @@ import java.util.ArrayList;
  * Created by iulian on 3/24/2018.
  */
 
-public class BakingStep {
+public class BakingStep implements Parcelable {
     private static final String TAG = BakingStep.class.getSimpleName();
 
     private int id;
@@ -21,6 +23,16 @@ public class BakingStep {
     private String description;
     private String videoURL;
     private String thumbnailURL;
+
+    private BakingStep(Parcel in) {
+        this.id = in.readInt();
+        this.shortDescription = in.readString();
+        this.description = in.readString();
+        this.videoURL = in.readString();
+        this.thumbnailURL = in.readString();
+    }
+
+    public BakingStep() {}
 
     /** Method reads all the baking steps from a json array
      * @return the list of baking steps
@@ -106,4 +118,31 @@ public class BakingStep {
                 ", thumbnailURL='" + thumbnailURL + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(shortDescription);
+        dest.writeString(description);
+        dest.writeString(videoURL);
+        dest.writeString(thumbnailURL);
+    }
+
+    public static final Parcelable.Creator<BakingStep> CREATOR = new Parcelable.Creator<BakingStep>() {
+
+        @Override
+        public BakingStep createFromParcel(Parcel source) {
+            return new BakingStep(source);
+        }
+
+        @Override
+        public BakingStep[] newArray(int size) {
+            return new BakingStep[size];
+        }
+    };
 }

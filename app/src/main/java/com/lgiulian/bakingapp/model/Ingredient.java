@@ -1,5 +1,7 @@
 package com.lgiulian.bakingapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -13,12 +15,20 @@ import java.util.ArrayList;
  * Created by iulian on 3/24/2018.
  */
 
-public class Ingredient {
+public class Ingredient implements Parcelable {
     private static final String TAG = Ingredient.class.getSimpleName();
 
     private double quantity;
     private String measure;
     private String ingredient;
+
+    private Ingredient(Parcel in) {
+        this.quantity = in.readDouble();
+        this.measure = in.readString();
+        this.ingredient = in.readString();
+    }
+
+    public Ingredient() {}
 
     /** Method reads all the ingredients from a json array
      * @return the list of ingredients
@@ -84,4 +94,29 @@ public class Ingredient {
                 ", ingredient='" + ingredient + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(quantity);
+        dest.writeString(measure);
+        dest.writeString(ingredient);
+    }
+
+    public static final Parcelable.Creator<Ingredient> CREATOR = new Parcelable.Creator<Ingredient>() {
+
+        @Override
+        public Ingredient createFromParcel(Parcel source) {
+            return new Ingredient(source);
+        }
+
+        @Override
+        public Ingredient[] newArray(int size) {
+            return new Ingredient[size];
+        }
+    };
 }
