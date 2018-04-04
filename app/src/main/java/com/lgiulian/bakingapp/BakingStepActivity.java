@@ -21,7 +21,6 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
     private String mMediaUrl;
     private String mInstructions;
 
-    private StepperLayout mStepperLayout;
     private Recipe mRecipe;
     private int mCurrentStep;
 
@@ -70,11 +69,11 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
                         .add(R.id.step_instructions, stepInstructionsFragment)
                         .commit();
             }
-            mStepperLayout = findViewById(R.id.stepperLayout);
+            StepperLayout stepperLayout = findViewById(R.id.stepperLayout);
             BakingStepAdapter bakingStepAdapter = new BakingStepAdapter(getSupportFragmentManager(), this, mRecipe.getSteps().size());
-            mStepperLayout.setAdapter(bakingStepAdapter);
-            mStepperLayout.setListener(this);
-            mStepperLayout.setCurrentStepPosition(mCurrentStep);
+            stepperLayout.setAdapter(bakingStepAdapter);
+            stepperLayout.setListener(this);
+            stepperLayout.setCurrentStepPosition(mCurrentStep);
         } else {
             mTwoFraments = false;
         }

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class RecipeStepInstructionsFragment extends Fragment {
-    public static final String STEP_INSTRUCTIONS_KEY = "STEP_INSTRUCTIONS_KEY";
+    private static final String STEP_INSTRUCTIONS_KEY = "STEP_INSTRUCTIONS_KEY";
 
     private String mStepInstructions;
 

@@ -45,7 +45,7 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
     }
 
     class RecipeStepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView mRecipeStepShortDesc;
+        private final TextView mRecipeStepShortDesc;
 
         public RecipeStepViewHolder(View itemView) {
             super(itemView);

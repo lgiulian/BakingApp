@@ -55,7 +55,7 @@ public class Recipe implements Parcelable {
     public Recipe() {}
 
     /** Method that reads all the recipes from a json file
-     * @param context
+     * @param context the context
      * @return a list of recipes
      */
     public static ArrayList<Recipe> getAllRecipes(Context context){
@@ -64,16 +64,12 @@ public class Recipe implements Parcelable {
         try {
             json = readJSONFile(context);
             JSONArray recipesArray = new JSONArray(json);
-            if (recipesArray != null) {
-                for (int i = 0; i < recipesArray.length(); i++) {
-                    Recipe recipe = getRecipeFromJsonObject(recipesArray.getJSONObject(i));
-                    recipes.add(recipe);
-                }
+            for (int i = 0; i < recipesArray.length(); i++) {
+                Recipe recipe = getRecipeFromJsonObject(recipesArray.getJSONObject(i));
+                recipes.add(recipe);
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,7 +77,7 @@ public class Recipe implements Parcelable {
         return recipes;
     }
 
-    private static Recipe getRecipeFromJsonObject(JSONObject recipeJsonObject) throws ParseException, JSONException {
+    private static Recipe getRecipeFromJsonObject(JSONObject recipeJsonObject) throws JSONException {
         Recipe recipe = new Recipe();
         recipe.setId(recipeJsonObject.optInt("id"));
         recipe.setName(recipeJsonObject.optString("name"));

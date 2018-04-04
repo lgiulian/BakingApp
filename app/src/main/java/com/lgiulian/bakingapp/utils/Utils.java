@@ -10,14 +10,14 @@ public class Utils {
 
     public static String getIngredientsPrettyFormat(Context context, Recipe recipe) {
         StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(context.getString(R.string.ingredients_label) + ": ");
+        strBuilder.append(context.getString(R.string.ingredients_label)).append(": ");
         int counter = 0;
         for(Ingredient ingredient: recipe.getIngredients()) {
             String delimiter = "";
             if (counter < recipe.getIngredients().size() - 1) {
                 delimiter = ", ";
             }
-            strBuilder.append(ingredient.getIngredient() + delimiter);
+            strBuilder.append(ingredient.getIngredient()).append(delimiter);
             counter++;
         }
         return strBuilder.toString();

@@ -13,15 +13,13 @@ import com.lgiulian.bakingapp.model.Recipe;
 import java.util.List;
 
 public class RecipeListAdapter extends ArrayAdapter<Recipe> {
-    private Context mContext;
-    private List<Recipe> mData;
-    private int mLayoutResourceId;
+    private final Context mContext;
+    private final int mLayoutResourceId;
 
     public RecipeListAdapter(Context context, int layoutResourceId, List<Recipe> recipes) {
         super(context, layoutResourceId, recipes);
         mContext = context;
         mLayoutResourceId = layoutResourceId;
-        mData = recipes;
     }
 
     static class ViewHolder {
@@ -41,7 +39,9 @@ public class RecipeListAdapter extends ArrayAdapter<Recipe> {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        holder.recipeTitle.setText(recipe.getName());
+        if (recipe != null) {
+            holder.recipeTitle.setText(recipe.getName());
+        }
         return convertView;
     }
 }

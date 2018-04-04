@@ -49,13 +49,11 @@ public class BakingStep implements Parcelable {
 
         } catch (JSONException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
         return steps;
     }
 
-    private static BakingStep getStepFromJsonObject(JSONObject recipeJsonObject) throws ParseException, JSONException {
+    private static BakingStep getStepFromJsonObject(JSONObject recipeJsonObject) {
         BakingStep step = new BakingStep();
         step.setId(recipeJsonObject.optInt("id"));
         step.setShortDescription(recipeJsonObject.optString("shortDescription"));

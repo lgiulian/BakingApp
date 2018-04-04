@@ -5,9 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
@@ -18,9 +16,7 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static com.lgiulian.bakingapp.ExoPlayerFragment.MEDIA_URL_KEY;
 import static com.lgiulian.bakingapp.MainActivity.RECIPE_KEY;
-import static com.lgiulian.bakingapp.RecipeStepInstructionsFragment.STEP_INSTRUCTIONS_KEY;
 
 public class RecipeActivity extends AppCompatActivity implements RecipeDetailsFragment.OnRecipeStepClickListener {
     public static final String STEP_SELECTED_KEY = "STEP_SELECTED_KEY";

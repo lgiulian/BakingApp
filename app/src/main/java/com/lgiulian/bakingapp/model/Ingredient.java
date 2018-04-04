@@ -45,13 +45,11 @@ public class Ingredient implements Parcelable {
 
         } catch (JSONException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
         return ingredients;
     }
 
-    private static Ingredient getIngredientFromJsonObject(JSONObject recipeJsonObject) throws ParseException, JSONException {
+    private static Ingredient getIngredientFromJsonObject(JSONObject recipeJsonObject) {
         Ingredient ingredient = new Ingredient();
         ingredient.setQuantity(recipeJsonObject.optDouble("quantity"));
         ingredient.setMeasure(recipeJsonObject.optString("measure"));

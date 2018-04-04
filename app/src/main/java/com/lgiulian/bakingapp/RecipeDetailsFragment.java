@@ -32,7 +32,6 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
     private OnRecipeStepClickListener mCallback;
     private Recipe mRecipe;
 
-    private TextView mIngredientTV;
     private RecyclerView mRecipeStepsRV;
     private RecipeStepsAdapter mRecipeStepsAdapter;
     private TextView mErrorMessageTv;
@@ -67,9 +66,9 @@ public class RecipeDetailsFragment extends Fragment implements LoaderManager.Loa
         }
         View rootView = inflater.inflate(R.layout.fragment_recipe_details, container, false);
 
-        mIngredientTV = rootView.findViewById(R.id.tv_recipe_ingredients);
+        TextView ingredientTV = rootView.findViewById(R.id.tv_recipe_ingredients);
         if (mRecipe != null) {
-            mIngredientTV.setText(Utils.getIngredientsPrettyFormat(getContext(), mRecipe));
+            ingredientTV.setText(Utils.getIngredientsPrettyFormat(getContext(), mRecipe));
         }
         
         mErrorMessageTv = rootView.findViewById(R.id.tv_error_message);

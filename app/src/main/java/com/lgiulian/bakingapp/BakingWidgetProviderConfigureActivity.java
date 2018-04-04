@@ -22,7 +22,7 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
 
     private static final String PREFS_NAME = "com.lgiulian.bakingapp.BakingWidgetProvider";
     private static final String PREF_PREFIX_KEY = "appwidget_";
-    int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
     private RecipeListAdapter mAdapter;
 
@@ -31,7 +31,7 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
     }
 
     // Write the prefix to the SharedPreferences object for this widget
-    static void saveTitlePref(Context context, int appWidgetId, String text) {
+    private static void saveTitlePref(Context context, int appWidgetId, String text) {
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
         prefs.putString(PREF_PREFIX_KEY + appWidgetId, text);
         prefs.apply();

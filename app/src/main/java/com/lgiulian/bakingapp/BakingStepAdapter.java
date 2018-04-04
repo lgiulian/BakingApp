@@ -9,7 +9,7 @@ import com.stepstone.stepper.Step;
 import com.stepstone.stepper.adapter.AbstractFragmentStepAdapter;
 
 public class BakingStepAdapter extends AbstractFragmentStepAdapter {
-    public static final String CURRENT_STEP_POSITION_KEY = "CURRENT_STEP_POSITION_KEY";
+    private static final String CURRENT_STEP_POSITION_KEY = "CURRENT_STEP_POSITION_KEY";
 
     private final int mStepsCounter;
 
