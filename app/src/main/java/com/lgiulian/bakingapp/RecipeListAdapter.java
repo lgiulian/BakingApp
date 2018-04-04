@@ -34,7 +34,7 @@ public class RecipeListAdapter extends ArrayAdapter<Recipe> {
         Recipe recipe = getItem(position);
         if (convertView == null) {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
-            convertView = inflater.inflate(R.layout.grid_item_layout, parent, false);
+            convertView = inflater.inflate(mLayoutResourceId, parent, false);
             holder = new ViewHolder();
             holder.recipeTitle = convertView.findViewById(R.id.recipe_name);
             convertView.setTag(holder);
