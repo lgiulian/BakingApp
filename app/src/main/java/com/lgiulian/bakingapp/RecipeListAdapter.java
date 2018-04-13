@@ -18,6 +18,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
     private final int mLayoutResourceId;
 
     private final OnRecipeClickListener mClickHandler;
+
     private List<Recipe> mData;
 
     public interface OnRecipeClickListener {
@@ -28,6 +29,11 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Vi
         mClickHandler = clickHandler;
         mLayoutResourceId = layoutResourceId;
         mData = recipes;
+    }
+
+    public void setData(List<Recipe> data) {
+        this.mData = data;
+        notifyDataSetChanged();
     }
 
     @NonNull

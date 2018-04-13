@@ -13,6 +13,8 @@ import com.google.android.exoplayer2.upstream.DataSourceInputStream;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.util.Util;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.lgiulian.bakingapp.R;
 
 import org.json.JSONArray;
@@ -23,7 +25,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,11 +35,23 @@ import java.util.List;
 public class Recipe implements Parcelable {
     private static final String TAG = Recipe.class.getSimpleName();
 
+    @SerializedName("id")
+    @Expose
     private int id;
+    @SerializedName("name")
+    @Expose
     private String name;
+    @SerializedName("ingredients")
+    @Expose
     private List<Ingredient> ingredients;
+    @SerializedName("steps")
+    @Expose
     private List<BakingStep> steps;
+    @SerializedName("servings")
+    @Expose
     private int servings;
+    @SerializedName("image")
+    @Expose
     private String image;
 
     private Recipe(Parcel in) {

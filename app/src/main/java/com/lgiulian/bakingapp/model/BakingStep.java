@@ -4,11 +4,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -18,10 +20,20 @@ import java.util.ArrayList;
 public class BakingStep implements Parcelable {
     private static final String TAG = BakingStep.class.getSimpleName();
 
+    @SerializedName("id")
+    @Expose
     private int id;
+    @SerializedName("shortDescription")
+    @Expose
     private String shortDescription;
+    @SerializedName("description")
+    @Expose
     private String description;
+    @SerializedName("videoURL")
+    @Expose
     private String videoURL;
+    @SerializedName("thumbnailURL")
+    @Expose
     private String thumbnailURL;
 
     private BakingStep(Parcel in) {

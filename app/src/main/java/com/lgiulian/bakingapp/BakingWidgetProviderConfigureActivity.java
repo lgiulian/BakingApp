@@ -10,8 +10,16 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.lgiulian.bakingapp.model.Recipe;
+import com.lgiulian.bakingapp.utils.ApiUtils;
+import com.lgiulian.bakingapp.utils.RecipeService;
 import com.lgiulian.bakingapp.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 /**
@@ -24,6 +32,8 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
     private RecipeListAdapter mAdapter;
+    private RecipeService mService;
+    private List<Recipe> mRecipes;
 
     public BakingWidgetProviderConfigureActivity() {
         super();
@@ -64,10 +74,12 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
 
         setContentView(R.layout.baking_widget_provider_configure);
 
+        mService = ApiUtils.getRecipeService();
+
         RecyclerView recyclerView = findViewById(R.id.recipes_list_view);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecipeListAdapter(this, R.layout.list_item_layout, Recipe.getAllRecipes(this));
+        mAdapter = new RecipeListAdapter(this, R.layout.list_item_layout, new ArrayList<Recipe>());
         recyclerView.setAdapter(mAdapter);
 
         // Find the widget id from the intent.
@@ -84,12 +96,37 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
             return;
         }
 
+        loadRecipes();
+    }
+
+    private void loadRecipes() {
+        mService.getRecipes().enqueue(new Callback<List<Recipe>>() {
+            @Override
+            public void onResponse(Call<List<Recipe>> call, Response<List<Recipe>> response) {
+                if (response.isSuccessful()) {
+                    Timber.d("recipes received from network");
+                    mRecipes = response.body();
+                    mAdapter.setData(mRecipes);
+                } else {
+                    Timber.d("ERROR getting recipes received from network");
+                    mRecipes = Recipe.getAllRecipes(BakingWidgetProviderConfigureActivity.this);
+                    mAdapter.setData(mRecipes);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Recipe>> call, Throwable t) {
+                Timber.d("ERROR getting recipes received from network in onFailure() with message: %s", t.getMessage());
+                mRecipes = Recipe.getAllRecipes(BakingWidgetProviderConfigureActivity.this);
+                mAdapter.setData(mRecipes);
+            }
+        });
     }
 
     @Override
     public void onRecipeSelected(int position) {
         Timber.d("clicked on recipe at position: %d", position);
-        Recipe selectedRecipe = Recipe.getAllRecipes(this).get(position);
+        Recipe selectedRecipe = mRecipes.get(position);
         final Context context = BakingWidgetProviderConfigureActivity.this;
 
         // When the recipe is clicked, store the string locally

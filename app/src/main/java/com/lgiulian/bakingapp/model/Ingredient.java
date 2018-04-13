@@ -2,13 +2,14 @@ package com.lgiulian.bakingapp.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -16,10 +17,15 @@ import java.util.ArrayList;
  */
 
 public class Ingredient implements Parcelable {
-    private static final String TAG = Ingredient.class.getSimpleName();
 
-    private double quantity;
+    @SerializedName("quantity")
+    @Expose
+    private Double quantity;
+    @SerializedName("measure")
+    @Expose
     private String measure;
+    @SerializedName("ingredient")
+    @Expose
     private String ingredient;
 
     private Ingredient(Parcel in) {
@@ -29,6 +35,30 @@ public class Ingredient implements Parcelable {
     }
 
     public Ingredient() {}
+
+    public Double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getMeasure() {
+        return measure;
+    }
+
+    public void setMeasure(String measure) {
+        this.measure = measure;
+    }
+
+    public String getIngredient() {
+        return ingredient;
+    }
+
+    public void setIngredient(String ingredient) {
+        this.ingredient = ingredient;
+    }
 
     /** Method reads all the ingredients from a json array
      * @return the list of ingredients
@@ -55,33 +85,9 @@ public class Ingredient implements Parcelable {
         ingredient.setMeasure(recipeJsonObject.optString("measure"));
         ingredient.setIngredient(recipeJsonObject.optString("ingredient"));
 
-        Log.v(TAG, ingredient.toString());
+        //Timber.d(ingredient.toString());
 
         return ingredient;
-    }
-
-    public double getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getMeasure() {
-        return measure;
-    }
-
-    public void setMeasure(String measure) {
-        this.measure = measure;
-    }
-
-    public String getIngredient() {
-        return ingredient;
-    }
-
-    public void setIngredient(String ingredient) {
-        this.ingredient = ingredient;
     }
 
     @Override
