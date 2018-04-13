@@ -6,9 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.lgiulian.bakingapp.model.Recipe;
 import com.lgiulian.bakingapp.utils.Utils;
@@ -18,7 +17,7 @@ import timber.log.Timber;
 /**
  * The configuration screen for the {@link BakingWidgetProvider BakingWidgetProvider} AppWidget.
  */
-public class BakingWidgetProviderConfigureActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class BakingWidgetProviderConfigureActivity extends AppCompatActivity implements RecipeListAdapter.OnRecipeClickListener {
 
     private static final String PREFS_NAME = "com.lgiulian.bakingapp.BakingWidgetProvider";
     private static final String PREF_PREFIX_KEY = "appwidget_";
@@ -65,10 +64,11 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
 
         setContentView(R.layout.baking_widget_provider_configure);
 
-        ListView listView = findViewById(R.id.recipes_list_view);
+        RecyclerView recyclerView = findViewById(R.id.recipes_list_view);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
+        recyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecipeListAdapter(this, R.layout.list_item_layout, Recipe.getAllRecipes(this));
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(this);
+        recyclerView.setAdapter(mAdapter);
 
         // Find the widget id from the intent.
         Intent intent = getIntent();
@@ -87,9 +87,9 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onRecipeSelected(int position) {
         Timber.d("clicked on recipe at position: %d", position);
-        Recipe selectedRecipe = mAdapter.getItem(position);
+        Recipe selectedRecipe = Recipe.getAllRecipes(this).get(position);
         final Context context = BakingWidgetProviderConfigureActivity.this;
 
         // When the recipe is clicked, store the string locally

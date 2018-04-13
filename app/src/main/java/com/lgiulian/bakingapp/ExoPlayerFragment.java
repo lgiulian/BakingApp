@@ -53,7 +53,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Timber.d("onCreate");
         mShouldAutoPlay = true;
         mResumePosition = C.TIME_UNSET;
         mResumeWindow = C.INDEX_UNSET;
@@ -64,7 +63,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(savedInstanceState != null) {
-            Timber.d("savedInstanceState != null");
             mMediaUrl = savedInstanceState.getString(MEDIA_URL_KEY);
             mResumePosition = savedInstanceState.getLong(RESUME_POSITION_KEY, C.TIME_UNSET);
             mResumeWindow = savedInstanceState.getInt(RESUME_WINDOW_KEY, C.INDEX_UNSET);
@@ -86,7 +84,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
      */
     private void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
-            Timber.d("initializePlayer");
             // Create an instance of the ExoPlayer.
             Handler mainHandler = new Handler();
             BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -108,7 +105,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
                 getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
         boolean haveResumePosition = (mResumeWindow != C.INDEX_UNSET);
         if (haveResumePosition) {
-            Timber.d("seekTo %d %d", mResumeWindow, mResumePosition);
             mExoPlayer.seekTo(mResumeWindow, mResumePosition);
         }
         mExoPlayer.prepare(mediaSource, !haveResumePosition, false);
@@ -122,7 +118,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
             mResumePosition = mExoPlayer.getCurrentPosition();
             mResumeWindow = mExoPlayer.getCurrentWindowIndex();
             mShouldAutoPlay = mExoPlayer.getPlayWhenReady();
-            Timber.d("setting mResumePosition to %d and mResumeWindow to %d", mResumePosition, mResumeWindow);
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
@@ -135,9 +130,7 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Timber.d("onSaveInstanceState");
         if (mExoPlayer != null) {
-            Timber.d("get exo player state here because onPause() or onStop() wasn't releasead the player yet");
             mResumePosition = mExoPlayer.getCurrentPosition();
             mResumeWindow = mExoPlayer.getCurrentWindowIndex();
             mShouldAutoPlay = mExoPlayer.getPlayWhenReady();
@@ -151,7 +144,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     @Override
     public void onPause() {
         super.onPause();
-        Timber.d("onPause()");
         if (Util.SDK_INT <= 23) {
             releasePlayer();
         }
@@ -160,7 +152,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     @Override
     public void onStop() {
         super.onStop();
-        Timber.d("onStop()");
         if (Util.SDK_INT > 23) {
             releasePlayer();
         }
@@ -169,7 +160,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     @Override
     public void onResume() {
         super.onResume();
-        Timber.d("onResume()");
         if (Util.SDK_INT <= 23) {
             if (!TextUtils.isEmpty(mMediaUrl)) {
                 initializePlayer(Uri.parse(mMediaUrl));
@@ -180,7 +170,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     @Override
     public void onStart() {
         super.onStart();
-        Timber.d("onStart()");
         if (Util.SDK_INT > 23) {
             if (!TextUtils.isEmpty(mMediaUrl)) {
                 initializePlayer(Uri.parse(mMediaUrl));
@@ -205,7 +194,6 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        Timber.d("playWhenReady = " + playWhenReady);
     }
 
     @Override

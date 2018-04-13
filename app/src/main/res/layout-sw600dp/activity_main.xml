@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/recipes_grid_view"
+<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/recipes_rv"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:columnWidth="180dp"
-    android:gravity="center"
-    android:horizontalSpacing="8dp"
-    android:numColumns="3"
-    android:padding="@dimen/default_padding"
-    android:stretchMode="columnWidth"
-    android:verticalSpacing="@dimen/default_vertical_spacing" />
+    android:padding="@dimen/default_padding"/>
