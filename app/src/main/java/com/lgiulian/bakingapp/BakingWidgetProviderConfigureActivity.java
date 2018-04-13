@@ -79,7 +79,7 @@ public class BakingWidgetProviderConfigureActivity extends AppCompatActivity imp
         RecyclerView recyclerView = findViewById(R.id.recipes_list_view);
         GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecipeListAdapter(this, R.layout.list_item_layout, new ArrayList<Recipe>());
+        mAdapter = new RecipeListAdapter(this, this, R.layout.list_item_layout, new ArrayList<Recipe>());
         recyclerView.setAdapter(mAdapter);
 
         // Find the widget id from the intent.

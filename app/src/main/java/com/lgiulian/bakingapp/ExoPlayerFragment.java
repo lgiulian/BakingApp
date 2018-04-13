@@ -1,6 +1,8 @@
 package com.lgiulian.bakingapp;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,11 +35,14 @@ import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import timber.log.Timber;
 
 public class ExoPlayerFragment extends Fragment implements Player.EventListener {
     private static final String MEDIA_URL_KEY = "MEDIA_URL_KEY";
+    private static final String THUMBNAIL_URL_KEY = "THUMBNAIL_URL_KEY";
     private static final String RESUME_POSITION_KEY = "RESUME_POSITION_KEY";
     private static final String RESUME_WINDOW_KEY = "RESUME_WINDOW_KEY";
     private static final String PLAYER_SHOULD_AUTO_PLAY_KEY = "PLAYER_SHOULD_AUTO_PLAY_KEY";
@@ -45,6 +50,7 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     private SimpleExoPlayer mExoPlayer;
     private PlayerView mPlayerView;
     private String mMediaUrl;
+    private String mThumbnailUrl;
 
     private long mResumePosition;
     private int mResumeWindow;
@@ -64,6 +70,7 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(savedInstanceState != null) {
             mMediaUrl = savedInstanceState.getString(MEDIA_URL_KEY);
+            mThumbnailUrl = savedInstanceState.getString(MEDIA_URL_KEY);
             mResumePosition = savedInstanceState.getLong(RESUME_POSITION_KEY, C.TIME_UNSET);
             mResumeWindow = savedInstanceState.getInt(RESUME_WINDOW_KEY, C.INDEX_UNSET);
             mShouldAutoPlay = savedInstanceState.getBoolean(PLAYER_SHOULD_AUTO_PLAY_KEY, true);
@@ -71,7 +78,11 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 
         mPlayerView = rootView.findViewById(R.id.playerView);
-        mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
+        if (!TextUtils.isEmpty(mThumbnailUrl)) {
+            Picasso.with(getContext()).load(mThumbnailUrl).into(target);
+        } else {
+            setPlayerDefaultArt();
+        }
 
         initializePlayer(Uri.parse(mMediaUrl));
 
@@ -128,6 +139,10 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
         this.mMediaUrl = mediaUrl;
     }
 
+    public void setmThumbnailUrl(String mThumbnailUrl) {
+        this.mThumbnailUrl = mThumbnailUrl;
+    }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         if (mExoPlayer != null) {
@@ -136,6 +151,7 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
             mShouldAutoPlay = mExoPlayer.getPlayWhenReady();
         }
         outState.putString(MEDIA_URL_KEY, mMediaUrl);
+        outState.putString(THUMBNAIL_URL_KEY, mThumbnailUrl);
         outState.putLong(RESUME_POSITION_KEY, mResumePosition);
         outState.putInt(RESUME_WINDOW_KEY, mResumeWindow);
         outState.putBoolean(PLAYER_SHOULD_AUTO_PLAY_KEY, mShouldAutoPlay);
@@ -225,4 +241,25 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
     public void onSeekProcessed() {
 
     }
+
+    Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            mPlayerView.setDefaultArtwork(bitmap);
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            setPlayerDefaultArt();
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+        }
+    };
+
+    private void setPlayerDefaultArt() {
+        mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getResources(), R.drawable.question_mark));
+    }
+
 }

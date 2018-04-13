@@ -5,4 +5,5 @@
     <string name="ingredients_label">Ingredients</string>
     <string name="appwidget_text">The list of ingredients for the chosen recipe</string>
     <string name="select_recipe">Select the recipe</string>
+    <string name="recipe_image_description">Recipe image</string>
 </resources>

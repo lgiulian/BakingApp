@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements RecipeListAdapter
         RecyclerView recyclerView = findViewById(R.id.recipes_rv);
         GridLayoutManager layoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.recipes_list_columns));
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecipeListAdapter(this, R.layout.grid_item_layout, new ArrayList<Recipe>());
+        mAdapter = new RecipeListAdapter(this, this, R.layout.grid_item_layout, new ArrayList<Recipe>());
         recyclerView.setAdapter(mAdapter);
 
         loadRecipes();
