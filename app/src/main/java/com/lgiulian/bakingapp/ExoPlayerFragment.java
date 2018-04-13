@@ -7,10 +7,12 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -36,16 +38,37 @@ import timber.log.Timber;
 
 public class ExoPlayerFragment extends Fragment implements Player.EventListener {
     private static final String MEDIA_URL_KEY = "MEDIA_URL_KEY";
+    private static final String RESUME_POSITION_KEY = "RESUME_POSITION_KEY";
+    private static final String RESUME_WINDOW_KEY = "RESUME_WINDOW_KEY";
+    private static final String PLAYER_SHOULD_AUTO_PLAY_KEY = "PLAYER_SHOULD_AUTO_PLAY_KEY";
 
     private SimpleExoPlayer mExoPlayer;
     private PlayerView mPlayerView;
     private String mMediaUrl;
 
+    private long mResumePosition;
+    private int mResumeWindow;
+    private boolean mShouldAutoPlay;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Timber.d("onCreate");
+        mShouldAutoPlay = true;
+        mResumePosition = C.TIME_UNSET;
+        mResumeWindow = C.INDEX_UNSET;
+        //setRetainInstance(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(savedInstanceState != null) {
+            Timber.d("savedInstanceState != null");
             mMediaUrl = savedInstanceState.getString(MEDIA_URL_KEY);
+            mResumePosition = savedInstanceState.getLong(RESUME_POSITION_KEY, C.TIME_UNSET);
+            mResumeWindow = savedInstanceState.getInt(RESUME_WINDOW_KEY, C.INDEX_UNSET);
+            mShouldAutoPlay = savedInstanceState.getBoolean(PLAYER_SHOULD_AUTO_PLAY_KEY, true);
         }
         View rootView = inflater.inflate(R.layout.fragment_player, container, false);
 
@@ -63,6 +86,7 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
      */
     private void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
+            Timber.d("initializePlayer");
             // Create an instance of the ExoPlayer.
             Handler mainHandler = new Handler();
             BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -76,23 +100,33 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
-
-            // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(getContext(), "ClassicalMusicQuiz");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(mShouldAutoPlay);
         }
+        // Prepare the MediaSource.
+        String userAgent = Util.getUserAgent(getContext(), "ClassicalMusicQuiz");
+        MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
+                getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+        boolean haveResumePosition = (mResumeWindow != C.INDEX_UNSET);
+        if (haveResumePosition) {
+            Timber.d("seekTo %d %d", mResumeWindow, mResumePosition);
+            mExoPlayer.seekTo(mResumeWindow, mResumePosition);
+        }
+        mExoPlayer.prepare(mediaSource, !haveResumePosition, false);
     }
 
     /**
      * Release ExoPlayer.
      */
     private void releasePlayer() {
-        mExoPlayer.stop();
-        mExoPlayer.release();
-        mExoPlayer = null;
+        if (mExoPlayer != null) {
+            mResumePosition = mExoPlayer.getCurrentPosition();
+            mResumeWindow = mExoPlayer.getCurrentWindowIndex();
+            mShouldAutoPlay = mExoPlayer.getPlayWhenReady();
+            Timber.d("setting mResumePosition to %d and mResumeWindow to %d", mResumePosition, mResumeWindow);
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
     }
 
     public void setMediaUrl(String mediaUrl) {
@@ -101,13 +135,57 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
+        Timber.d("onSaveInstanceState");
+        if (mExoPlayer != null) {
+            Timber.d("get exo player state here because onPause() or onStop() wasn't releasead the player yet");
+            mResumePosition = mExoPlayer.getCurrentPosition();
+            mResumeWindow = mExoPlayer.getCurrentWindowIndex();
+            mShouldAutoPlay = mExoPlayer.getPlayWhenReady();
+        }
         outState.putString(MEDIA_URL_KEY, mMediaUrl);
+        outState.putLong(RESUME_POSITION_KEY, mResumePosition);
+        outState.putInt(RESUME_WINDOW_KEY, mResumeWindow);
+        outState.putBoolean(PLAYER_SHOULD_AUTO_PLAY_KEY, mShouldAutoPlay);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
+    public void onPause() {
+        super.onPause();
+        Timber.d("onPause()");
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Timber.d("onStop()");
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Timber.d("onResume()");
+        if (Util.SDK_INT <= 23) {
+            if (!TextUtils.isEmpty(mMediaUrl)) {
+                initializePlayer(Uri.parse(mMediaUrl));
+            }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Timber.d("onStart()");
+        if (Util.SDK_INT > 23) {
+            if (!TextUtils.isEmpty(mMediaUrl)) {
+                initializePlayer(Uri.parse(mMediaUrl));
+            }
+        }
     }
 
     @Override

@@ -47,6 +47,7 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
         }
 
         if (savedInstanceState == null) {
+            Timber.d("creating exoplayer instance...");
             ExoPlayerFragment playerFragment = new ExoPlayerFragment();
             playerFragment.setMediaUrl(mMediaUrl);
 
@@ -73,6 +74,7 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
             BakingStepAdapter bakingStepAdapter = new BakingStepAdapter(getSupportFragmentManager(), this, mRecipe.getSteps().size());
             stepperLayout.setAdapter(bakingStepAdapter);
             stepperLayout.setListener(this);
+            Timber.d("setCurrentStepPosition to mCurrentStep");
             stepperLayout.setCurrentStepPosition(mCurrentStep);
         } else {
             mTwoFraments = false;
@@ -102,6 +104,9 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
 
     @Override
     public void onStepSelected(int newStepPosition) {
+        if (newStepPosition == mCurrentStep) {
+            return;
+        }
         Timber.d("new step position: %d", newStepPosition);
         mCurrentStep = newStepPosition;
         List<BakingStep> steps = mRecipe.getSteps();
