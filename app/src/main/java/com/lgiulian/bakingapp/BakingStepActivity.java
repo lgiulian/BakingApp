@@ -19,6 +19,7 @@ import timber.log.Timber;
 
 public class BakingStepActivity extends AppCompatActivity implements StepperLayout.StepperListener {
     private String mMediaUrl;
+    private String mThumbnailUrl;
     private String mInstructions;
 
     private Recipe mRecipe;
@@ -41,6 +42,7 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
             BakingStep step = steps.get(mCurrentStep);
 
             mMediaUrl = step.getVideoURL();
+            mThumbnailUrl = step.getThumbnailURL();
             mInstructions = step.getDescription();
             Timber.d("step instructions: %s", mInstructions);
             getSupportActionBar().setTitle(mRecipe.getName());
@@ -50,6 +52,7 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
             Timber.d("creating exoplayer instance...");
             ExoPlayerFragment playerFragment = new ExoPlayerFragment();
             playerFragment.setMediaUrl(mMediaUrl);
+            playerFragment.setThumbnailUrl(mThumbnailUrl);
 
             FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -112,10 +115,12 @@ public class BakingStepActivity extends AppCompatActivity implements StepperLayo
         List<BakingStep> steps = mRecipe.getSteps();
         BakingStep step = steps.get(mCurrentStep);
         mMediaUrl = step.getVideoURL();
+        mThumbnailUrl = step.getThumbnailURL();
         mInstructions = step.getDescription();
 
         ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
         exoPlayerFragment.setMediaUrl(step.getVideoURL());
+        exoPlayerFragment.setThumbnailUrl(mThumbnailUrl);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.playerView, exoPlayerFragment)

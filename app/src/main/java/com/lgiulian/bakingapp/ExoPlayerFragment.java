@@ -139,8 +139,8 @@ public class ExoPlayerFragment extends Fragment implements Player.EventListener 
         this.mMediaUrl = mediaUrl;
     }
 
-    public void setmThumbnailUrl(String mThumbnailUrl) {
-        this.mThumbnailUrl = mThumbnailUrl;
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.mThumbnailUrl = thumbnailUrl;
     }
 
     @Override

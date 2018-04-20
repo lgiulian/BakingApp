@@ -59,6 +59,7 @@ public class RecipeActivity extends AppCompatActivity implements RecipeDetailsFr
             if (savedInstanceState == null) {
                 ExoPlayerFragment playerFragment = new ExoPlayerFragment();
                 playerFragment.setMediaUrl(mRecipe.getSteps().get(0).getVideoURL());
+                playerFragment.setThumbnailUrl(mRecipe.getSteps().get(0).getThumbnailURL());
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -103,6 +104,7 @@ public class RecipeActivity extends AppCompatActivity implements RecipeDetailsFr
         if (mTwoPane) {
             ExoPlayerFragment exoPlayerFragment = new ExoPlayerFragment();
             exoPlayerFragment.setMediaUrl(step.getVideoURL());
+            exoPlayerFragment.setThumbnailUrl(step.getThumbnailURL());
 
             getSupportFragmentManager().beginTransaction()
                 .replace(R.id.playerView, exoPlayerFragment)
